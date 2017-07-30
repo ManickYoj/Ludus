@@ -101,3 +101,6 @@ ENV/
 # Sublime
 *.sublime-project
 *.sublime-workspace
+
+# DB
+*.sqlite3

@@ -1,9 +1,10 @@
 from django.db import models
 from django.conf import settings
-
+from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 NAME_MAX_LENGTH = 60
-ATTR_DEFAULT = 5
+ATTR_DEFAULT = 0
 
 
 class Player(models.Model):
@@ -20,10 +21,43 @@ class Player(models.Model):
     return self.name
 
 
+# Create a new Player object when a new user registers
+@receiver(models.signals.post_save, sender=User)
+def create_player(sender, instance, created, **kwargs):
+  if created:
+    Player.objects.create(
+      user=instance,
+      name=instance.username
+    )
+
+
+# If the User model is updated, ensure the Player is too
+@receiver(models.signals.post_save, sender=User)
+def save_player(sender, instance, created, **kwargs):
+  instance.player.save()
+
+
 class School(models.Model):
+  # Enum values
+  RECRUIT = 'REC'
+  PREPARE = 'PRE'
+  FIGHT = 'FIG'
+  END = 'END'
+
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
   day = models.PositiveIntegerField(default=0)
+  denarii = models.PositiveIntegerField(default=2000)
+  day_phase = models.CharField(
+    max_length=3,
+    choices=(
+      (RECRUIT, 'Recruit'),
+      (PREPARE, 'Prepare'),
+      (FIGHT, 'Fight'),
+      (END, 'End of Day'),
+    ),
+    default=RECRUIT
+  )
 
   # Foreign Keys
   player = models.ForeignKey(
@@ -38,6 +72,7 @@ class School(models.Model):
 class Gladiator(models.Model):
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
+  value = models.IntegerField(default=0)
   agility = models.IntegerField(default=ATTR_DEFAULT)
   strength = models.IntegerField(default=ATTR_DEFAULT)
   endurance = models.IntegerField(default=ATTR_DEFAULT)

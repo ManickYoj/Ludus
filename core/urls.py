@@ -32,6 +32,13 @@ urlpatterns = [
     name='login'
   ),
 
+  # Signup
+  url(
+    r'^signup/$',
+    views.signup,
+    name='signup'
+  ),
+
   # Logout
   url(
     r'^logout/$',
