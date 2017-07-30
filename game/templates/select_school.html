@@ -1,0 +1,18 @@
+{% block content %}
+  <h2> School Selection </h2>
+
+  <ul>
+    {% for school in schools %}
+      <li>
+        <a href="{% url 'game:game' school.id %}">
+          {{ school.name }}: Day {{ school.day }}
+        </a>
+      </li>
+    {% endfor %}
+      <li>
+        <a href="{% url 'game:create-school' %}">
+          + Create New
+        </a>
+      </li>
+  </ul>
+{% endblock %}

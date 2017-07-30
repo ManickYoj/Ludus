@@ -105,4 +105,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'game:schoolselect'
+LOGIN_REDIRECT_URL = 'game:select-school'

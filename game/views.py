@@ -6,9 +6,16 @@ from .models import Player
 
 
 @login_required
-def school_select(request):
-  print "foo"
-  return render(request, 'school_select.html')
+def select_school(request):
+  context = {
+    'schools': request.user.player.school_set.all(),
+  }
+  return render(request, 'select_school.html', context)
+
+
+@login_required
+def create_school(request):
+  pass
 
 
 @login_required
@@ -26,3 +33,8 @@ def players(request):
 def player(request, player_id):
   player = get_object_or_404(Player, pk=player_id)
   return HttpResponse("Hello %s" % player.name)
+
+
+@login_required
+def game(request, school_id):
+  pass
