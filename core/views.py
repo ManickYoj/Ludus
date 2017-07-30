@@ -23,7 +23,7 @@ def signup(request):
       login(request, user)
 
       # Redirect the new user to the game app
-      return redirect('game:school_select')
+      return redirect('game:select-school')
 
   else:
     form = UserCreationForm()

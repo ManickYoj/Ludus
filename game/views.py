@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.forms import modelform_factory
 
-from .models import Player
+from .models import Player, School
 
 
 @login_required
@@ -15,7 +16,21 @@ def select_school(request):
 
 @login_required
 def create_school(request):
-  pass
+  CreateSchoolForm = modelform_factory(School, fields=["name"])
+
+  if request.method == 'POST':
+    form = CreateSchoolForm(request.POST)
+
+    if form.is_valid():
+      instance = form.save(commit=False)
+      instance.player = request.user.player
+      instance.save()
+      return redirect('game:select-school')
+
+  else:
+    form = CreateSchoolForm()
+
+  return render(request, 'create_school.html', {'form': form})
 
 
 @login_required

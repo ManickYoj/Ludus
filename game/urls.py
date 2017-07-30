@@ -10,7 +10,7 @@ urlpatterns = [
     ),
 
     url(
-      r'^school_create/$',
+      r'^create-school/$',
       views.create_school,
       name='create-school'
     ),
