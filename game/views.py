@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.forms import modelform_factory
 
-from .models import Player, School
+from models import Player, School
 
 
 @login_required
