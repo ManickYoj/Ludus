@@ -52,4 +52,8 @@ def player(request, player_id):
 
 @login_required
 def game(request, school_id):
-  pass
+  # TODO: A user should not be able to access another's schools
+  context = {
+    'school': get_object_or_404(School, pk=school_id)
+  }
+  return render(request, 'base/base_game.html', context)
