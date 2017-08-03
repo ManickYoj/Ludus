@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'django_extensions',
     'game.apps.GameConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -106,3 +107,8 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'game:select-school'
+
+# Shell Plus Config
+SHELL_PLUS_POST_IMPORTS = [
+    ('game.factories', '*'),
+]

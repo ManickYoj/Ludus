@@ -84,7 +84,7 @@ class Day(models.Model):
 @receiver(models.signals.post_save, sender='game.School')
 def create_day(sender, instance, created, **kwargs):
   if created:
-    Day.objects.create(school=instance)
+    Day.objects.get_or_create(school=instance)
 
 
 # If the School model is updated, ensure the Day is too
