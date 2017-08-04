@@ -2,6 +2,7 @@ from factory import DjangoModelFactory, lazy_attribute
 import faker
 fake = faker.Faker()
 
+
 class UserFactory(DjangoModelFactory):
   class Meta:
     model = 'auth.User'
