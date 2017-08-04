@@ -3,15 +3,9 @@ from django.db import models
 
 class Match(models.Model):
   # Data
-  win_reward = models.IntegerField(default=0)
-  lose_reward = models.IntegerField(default=0)
-  day = models.PositiveIntegerField(default=0)
-
-  # Foreign Keys
-  participants = models.ManyToManyField(
-    'Gladiator',
-    through='Participation'
-  )
+  base_pay = models.IntegerField(default=0)
+  base_reward = models.IntegerField(default=0)
+  seed = models.IntegerField()
 
   class Meta:
     app_label = 'game'

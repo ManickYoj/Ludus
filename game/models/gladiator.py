@@ -3,24 +3,36 @@ from django.db import models
 from _consts import ATTR_DEFAULT, NAME_MAX_LENGTH
 
 
-class RecruitManager(models.Manager):
+class ActiveManager(models.Manager):
   def get_queryset(self):
     return super(
-      RecruitManager, self
-    ).get_queryset().filter(recruited=True)
+      ActiveManager, self
+    ).get_queryset().filter(
+      killed_on=None
+    ).exclude(
+      recruited_on=None
+    )
 
 
 class CandidateManager(models.Manager):
   def get_queryset(self):
     return super(
       CandidateManager, self
-    ).get_queryset().filter(recruited=False)
+    ).get_queryset().filter(recruited_on=None)
+
+
+class KilledManager(models.Manager):
+  def get_queryset(self):
+    return super(
+      KilledManager, self
+    ).get_queryset().exclude(killed_on=None)
 
 
 class Gladiator(models.Model):
   # Managers
-  recruits = RecruitManager()
+  active = ActiveManager()
   candidates = CandidateManager()
+  killed = KilledManager()
 
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
@@ -31,9 +43,11 @@ class Gladiator(models.Model):
   strength = models.IntegerField(default=ATTR_DEFAULT)
   endurance = models.IntegerField(default=ATTR_DEFAULT)
 
-  recruited = models.BooleanField(default=False)
-  reserved = models.BooleanField(default=False)
-
+  reserved_on = models.PositiveIntegerField(
+    blank=True,
+    null=True,
+    default=None
+  )
   recruited_on = models.PositiveIntegerField(
     blank=True,
     null=True,

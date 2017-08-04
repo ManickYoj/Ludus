@@ -18,6 +18,7 @@ class School(models.Model):
   name = models.CharField(max_length=NAME_MAX_LENGTH)
   denarii = models.PositiveIntegerField(default=2000)
   day = models.PositiveIntegerField(default=0)
+  ai = models.BooleanField(default=False)
   period = models.CharField(
     max_length=3,
     choices=(
