@@ -1,5 +1,6 @@
 from expects.matchers import Matcher
 
+
 class change(Matcher):
   def __init__(self, variable_thunk, *args):
     self.variable_thunk = variable_thunk
@@ -25,7 +26,7 @@ class change(Matcher):
     result = self.variable_thunk()
 
     if self.expected_initial is None and self.expected_result is None:
-      passed = initial != final
+      passed = initial != result
 
     else:
       passed = True

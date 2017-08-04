@@ -1,5 +1,4 @@
 from django.db import models
-
 from _consts import NAME_MAX_LENGTH
 
 
@@ -49,7 +48,7 @@ class School(models.Model):
   last period. If the day advances, triggers regenerating sets of recruits
   and challenges.
   """
-  def advancePeriod(self):
+  def advance_period(self):
     # TODO: When linked with recruits, ensure that this method reserves any
     # recruits with a hold on them for the next day.
     index = (School.PERIODS.index(self.period) + 1) % len(School.PERIODS)
@@ -59,3 +58,31 @@ class School(models.Model):
       self.day += 1
 
     self.save()
+
+  def generate_candidates(self, count=3):
+    from game.models import Gladiator
+    from game.factories import GladiatorFactory
+    from random import choice
+
+    # Remove all candidates from the school who were not reserved yesterday
+    Gladiator.candidates.filter(
+      school=self,
+    ).exclude(
+      reserved_on=self.day - 1
+    ).delete()
+
+    candidates = list(Gladiator.candidates.filter(
+      school=self
+    ))
+
+    generators = [
+      lambda: GladiatorFactory(convict=True, school=self),
+      lambda: GladiatorFactory(conscript=True, school=self),
+    ]
+
+    # Generate a new candidate from a random generator until we have filled up
+    # the roster
+    while len(candidates) < count:
+      candidates.append(choice(generators)())
+
+    return candidates

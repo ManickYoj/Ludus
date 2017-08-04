@@ -30,12 +30,14 @@ class KilledManager(models.Manager):
 
 class Gladiator(models.Model):
   # Managers
+  objects = models.Manager()
   active = ActiveManager()
   candidates = CandidateManager()
   killed = KilledManager()
 
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
+  background = models.CharField(max_length=NAME_MAX_LENGTH)
   value = models.IntegerField(default=0)
   fame = models.IntegerField(default=0)
 
@@ -62,9 +64,6 @@ class Gladiator(models.Model):
   # Foreign Key
   school = models.ForeignKey(
     'School',
-    blank=True,
-    default=None,
-    null=True,
     on_delete=models.CASCADE,
   )
 
