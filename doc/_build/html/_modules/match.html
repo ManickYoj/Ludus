@@ -44,15 +44,9 @@
 
 <div class="viewcode-block" id="Match"><a class="viewcode-back" href="../modules/models.html#game.models.Match">[docs]</a><span class="k">class</span> <span class="nc">Match</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
   <span class="c1"># Data</span>
-  <span class="n">win_reward</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-  <span class="n">lose_reward</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-  <span class="n">day</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-  <span class="c1"># Foreign Keys</span>
-  <span class="n">participants</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span>
-    <span class="s1">&#39;Gladiator&#39;</span><span class="p">,</span>
-    <span class="n">through</span><span class="o">=</span><span class="s1">&#39;Participation&#39;</span>
-  <span class="p">)</span>
+  <span class="n">base_pay</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">base_reward</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">seed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
 
   <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
     <span class="n">app_label</span> <span class="o">=</span> <span class="s1">&#39;game&#39;</span></div>

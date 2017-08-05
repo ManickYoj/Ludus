@@ -40,15 +40,12 @@ class School(models.Model):
   class Meta:
     app_label = 'game'
 
-  """
-  advanceDay
-  --------
-
-  Advances the period of the day, or advances one day to the next if at the
-  last period. If the day advances, triggers regenerating sets of recruits
-  and challenges.
-  """
   def advance_period(self):
+    """
+    Increment the period of the day, or advance the day if appropriate. If
+    the day does advance, triggers the regeneration of recruits and
+    challenges.
+    """
     # TODO: When linked with recruits, ensure that this method reserves any
     # recruits with a hold on them for the next day.
     index = (School.PERIODS.index(self.period) + 1) % len(School.PERIODS)
@@ -60,6 +57,17 @@ class School(models.Model):
     self.save()
 
   def generate_candidates(self, count=3):
+    """
+    Generates a set of candidates totaling `count`. Candidates reserved on
+    the previous day will be included in the set.
+
+    Args:
+      count: The number of candidates to be in the resulting candidate pool
+      (default: {3})
+
+    Returns:
+      The `count` candidate gladiators (list)
+    """
     from game.models import Gladiator
     from game.factories import GladiatorFactory
     from random import choice

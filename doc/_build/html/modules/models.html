@@ -47,9 +47,39 @@ loads each model into the model module namespace so that we
 can eg. <cite>from model import Player</cite> rather than the more verbose
 <cite>from model.player import Player</cite>.</p>
 <dl class="class">
-<dt id="game.models.Day">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Day</code><span class="sig-paren">(</span><em>id</em>, <em>number</em>, <em>phase</em>, <em>school</em><span class="sig-paren">)</span><a class="headerlink" href="#game.models.Day" title="Permalink to this definition">¶</a></dt>
+<dt id="game.models.Challenge">
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Challenge</code><span class="sig-paren">(</span><em>id</em>, <em>status</em>, <em>day</em>, <em>school</em>, <em>gladiator</em>, <em>match</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/challenge.html#Challenge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Challenge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="class">
+<dt id="game.models.Gladiator">
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Gladiator</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>background</em>, <em>value</em>, <em>fame</em>, <em>agility</em>, <em>strength</em>, <em>endurance</em>, <em>reserved_on</em>, <em>recruited_on</em>, <em>killed_on</em>, <em>school</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gladiator.html#Gladiator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Gladiator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="game.models.Gladiator.recruit">
+<code class="descname">recruit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gladiator.html#Gladiator.recruit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Gladiator.recruit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recruit a candidate gladiator.</p>
+<p>Updates the current gladiator object to reflect that it has been recruited.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="game.models.Match">
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Match</code><span class="sig-paren">(</span><em>id</em>, <em>base_pay</em>, <em>base_reward</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/match.html#Match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="game.models.Player">
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Player</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>user</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/player.html#Player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Player" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="game.models.User">
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">User</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/django/contrib/auth/models.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Users within the Django authentication system are represented by this
+model.</p>
+<p>Username, password and email are required. Other fields are optional.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="game.models.receiver">
@@ -68,60 +98,40 @@ signal (or list of signals) and keyword arguments to connect:</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="game.models.Gladiator">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Gladiator</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>value</em>, <em>fame</em>, <em>agility</em>, <em>strength</em>, <em>endurance</em>, <em>recruited</em>, <em>reserved</em>, <em>recruited_on</em>, <em>killed_on</em>, <em>school</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gladiator.html#Gladiator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Gladiator" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="game.models.Gladiator.recruit">
-<code class="descname">recruit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gladiator.html#Gladiator.recruit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Gladiator.recruit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recruit a candidate gladiator.</p>
-<p>Updates the current gladiator object to reflect that it has been recruited.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="game.models.Match">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Match</code><span class="sig-paren">(</span><em>id</em>, <em>win_reward</em>, <em>lose_reward</em>, <em>day</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/match.html#Match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Match" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="game.models.Participation">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Participation</code><span class="sig-paren">(</span><em>id</em>, <em>victor</em>, <em>gladiator</em>, <em>match</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/participation.html#Participation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Participation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="game.models.Player">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">Player</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>user</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/player.html#Player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.Player" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="game.models.User">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">User</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/django/contrib/auth/models.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.User" title="Permalink to this definition">¶</a></dt>
-<dd><p>Users within the Django authentication system are represented by this
-model.</p>
-<p>Username, password and email are required. Other fields are optional.</p>
-</dd></dl>
-
-<dl class="function">
-<dt>
-<code class="descclassname">game.models.</code><code class="descname">receiver</code><span class="sig-paren">(</span><em>signal</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/django/dispatch/dispatcher.html#receiver"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>A decorator for connecting receivers to signals. Used by passing in the
-signal (or list of signals) and keyword arguments to connect:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">signal_receiver</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="o">...</span>
-
-<span class="nd">@receiver</span><span class="p">([</span><span class="n">post_save</span><span class="p">,</span> <span class="n">post_delete</span><span class="p">],</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">signals_receiver</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="o">...</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="class">
 <dt id="game.models.School">
-<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">School</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>denarii</em>, <em>day</em>, <em>period</em>, <em>player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/school.html#School"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.School" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property">class </em><code class="descclassname">game.models.</code><code class="descname">School</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>denarii</em>, <em>day</em>, <em>ai</em>, <em>period</em>, <em>player</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/school.html#School"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.School" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="game.models.School.advance_period">
+<code class="descname">advance_period</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/school.html#School.advance_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.School.advance_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the period of the day, or advance the day if appropriate. If
+the day does advance, triggers the regeneration of recruits and
+challenges.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.models.School.generate_candidates">
+<code class="descname">generate_candidates</code><span class="sig-paren">(</span><em>count=3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/school.html#School.generate_candidates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.models.School.generate_candidates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a set of candidates totaling <cite>count</cite>. Candidates reserved on
+the previous day will be included in the set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>count</strong> – The number of candidates to be in the resulting candidate pool</li>
+<li><strong>(</strong><strong>default</strong> – {3})</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The <cite>count</cite> candidate gladiators
+list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 
