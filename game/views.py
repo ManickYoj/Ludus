@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.forms import modelform_factory
+from django.core.exceptions import PermissionDenied
 
 from models import Player, School
 
@@ -52,8 +53,31 @@ def player(request, player_id):
 
 @login_required
 def game(request, school_id):
-  # TODO: A user should not be able to access another's schools
-  context = {
-    'school': get_object_or_404(School, pk=school_id)
+  school = get_object_or_404(School, pk=school_id)
+
+  HANDLERS = {
+    School.RECRUIT: recruit,
+    School.PREPARE: prepare,
+    School.FIGHT: fight,
   }
-  return render(request, 'base/base_game.html', context)
+
+  if not school.player.user == request.user:
+    raise PermissionDenied
+
+  return HANDLERS[school.period](request, school)
+
+
+def recruit(request, school):
+  context = {
+    'school': school,
+    'candidates': school.gladiator_set.filter(recruited_on=None),
+  }
+  return render(request, 'pages/recruit.html', context)
+
+
+def prepare(self):
+  pass
+
+
+def fight(self):
+  pass

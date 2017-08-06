@@ -1,0 +1,9 @@
+{% extends "base/base_game.html" %}
+
+{% block content %}
+  <ul>
+    {% for candidate in candidates %}
+      {% include "partials/gladiator_card.html" with gladiator=candidate school=school only %}
+    {% endfor %}
+  </ul>
+{% endblock %}

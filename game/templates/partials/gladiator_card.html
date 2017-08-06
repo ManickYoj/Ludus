@@ -1,0 +1,16 @@
+<h4>{{gladiator.name}}</h4>
+{{gladiator.background}}
+{% if gladiator.recruited_on %}
+  Member of {{school.name}} since day {{ gladiator.recruited_on}}
+{% endif %}
+
+<ul>
+  <li>STR: {{gladiator.strength}}</li>
+  <li>AGI: {{gladiator.agility}}</li>
+  <li>END: {{gladiator.endurance}}</li>
+</ul>
+
+{% if not gladiator.recruited_on %}
+  <br />
+  Recruit Cost: {{gladiator.value}} denarii
+{% endif %}

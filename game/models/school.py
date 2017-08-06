@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 from _consts import NAME_MAX_LENGTH
 
 
@@ -53,6 +54,7 @@ class School(models.Model):
 
     if index == 0:
       self.day += 1
+      self.generate_candidates()
 
     self.save()
 
@@ -94,3 +96,18 @@ class School(models.Model):
       candidates.append(choice(generators)())
 
     return candidates
+
+  @receiver(models.signals.post_save, sender='game.School')
+  def setup_school(sender, instance, created, **kwargs):
+    """
+    Run setup logic on school. Specifically, generate initial candidates and
+    challenges.
+
+    Args:
+      sender: [description]
+      instance: [description]
+      created: [description]
+      **kwargs: [description]
+    """
+    if created:
+      instance.generate_candidates()
