@@ -111,3 +111,12 @@ class School(models.Model):
     """
     if created:
       instance.generate_candidates()
+
+  def purchase(self, amount):
+    print (self.denarii)
+    self.denarii -= amount
+    print (self.denarii)
+    print self.save
+    # TODO: This save works in the shell but not on the server
+    # This may be caused by something to do with transactions
+    self.save()

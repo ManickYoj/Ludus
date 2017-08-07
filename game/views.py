@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.forms import modelform_factory
 from django.core.exceptions import PermissionDenied
+from django import forms
 
-from models import Player, School
+from models import Player, School, Gladiator
 
 
 @login_required
@@ -67,17 +68,58 @@ def game(request, school_id):
   return HANDLERS[school.period](request, school)
 
 
+# This form is not actually used on the recruit page at present
+# Rather, a matching custom form is rendered (to make the layout easier)
+# and this class is used to validate the form response
+class RecruitmentForm(forms.Form):
+  def __init__(self, candidates, *args, **kwargs):
+    super(RecruitmentForm, self).__init__(*args, **kwargs)
+
+    candiate_choices = [(c.id, c.name) for c in candidates]
+    candiate_choices.append(("-1", 'Do not recruit a gladiator today.'))
+
+    self.fields['recruit_id'] = forms.ChoiceField(
+      choices=candiate_choices,
+      widget=forms.RadioSelect,
+    )
+
+
 def recruit(request, school):
+  candidates = school.gladiator_set.filter(recruited_on=None)
+
+  if request.method == 'POST':
+    form = RecruitmentForm(candidates, request.POST)
+
+    if form.is_valid():
+      recruit_id = form.cleaned_data['recruit_id']
+      candidate_ids = [c.id for c in candidates]
+      if int(recruit_id) in candidate_ids:
+        recruit = get_object_or_404(Gladiator, pk=int(recruit_id))
+        recruit.recruit()
+        school.advance_period()
+        return redirect('game:game', school_id=school.id)
+
+      elif int(recruit_id) == -1:
+        school.advance_period()
+        return redirect('game:game', school_id=school.id)
+
+  else:
+    form = RecruitmentForm(candidates)
+
   context = {
     'school': school,
-    'candidates': school.gladiator_set.filter(recruited_on=None),
+    'candidates': candidates,
+    'form': form,
   }
+
   return render(request, 'pages/recruit.html', context)
 
 
-def prepare(self):
-  pass
+def prepare(request, school):
+  school.advance_period()
+  return redirect('game:game', school_id=school.id)
 
 
-def fight(self):
-  pass
+def fight(request, school):
+  school.advance_period()
+  return redirect('game:game', school_id=school.id)

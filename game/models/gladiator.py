@@ -82,4 +82,5 @@ class Gladiator(models.Model):
     self.recruited_on = self.school.day
     self.recruited = True
     self.reserved = False
+    self.school.purchase(self.value)
     self.save()

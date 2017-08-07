@@ -1,9 +1,23 @@
 {% extends "base/base_game.html" %}
 
 {% block content %}
-  <ul>
+  <form method=post>
+    {% csrf_token %}
+      
     {% for candidate in candidates %}
-      {% include "partials/gladiator_card.html" with gladiator=candidate school=school only %}
+      <div>
+        <label>
+          {% include "partials/gladiator_card.html" with gladiator=candidate school=school only %}
+          <input type="radio" name="recruit_id" value={{candidate.id}}>
+        </label>
+      </div>
     {% endfor %}
-  </ul>
+    <div>
+      <label>
+        Do not recruit a gladiator today.
+        <input type="radio" name="recruit_id" value="-1">
+      </label>
+    </div>
+    <input type="submit" name="Recruit">
+  </form>
 {% endblock %}
