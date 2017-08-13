@@ -61,7 +61,7 @@ class Gladiator(models.Model):
     default=None
   )
 
-  # Foreign Key
+  # Foreign Keys
   school = models.ForeignKey(
     'School',
     on_delete=models.CASCADE,
@@ -82,5 +82,4 @@ class Gladiator(models.Model):
     self.recruited_on = self.school.day
     self.recruited = True
     self.reserved = False
-    self.school.purchase(self.value)
     self.save()

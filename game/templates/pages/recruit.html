@@ -1,6 +1,7 @@
 {% extends "base/base_game.html" %}
 
 {% block content %}
+  
   <form method=post>
     {% csrf_token %}
       
@@ -18,6 +19,11 @@
         <input type="radio" name="recruit_id" value="-1">
       </label>
     </div>
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">
+        <strong style="color: firebrick">{{ error|escape }}</strong>
+      </div>
+    {% endfor %}
     <input type="submit" name="Recruit">
   </form>
 {% endblock %}

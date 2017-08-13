@@ -91,15 +91,21 @@ def recruit(request, school):
     form = RecruitmentForm(candidates, request.POST)
 
     if form.is_valid():
-      recruit_id = form.cleaned_data['recruit_id']
+      recruit_id = int(form.cleaned_data['recruit_id'])
       candidate_ids = [c.id for c in candidates]
-      if int(recruit_id) in candidate_ids:
-        recruit = get_object_or_404(Gladiator, pk=int(recruit_id))
-        recruit.recruit()
-        school.advance_period()
-        return redirect('game:game', school_id=school.id)
 
-      elif int(recruit_id) == -1:
+      if recruit_id in candidate_ids:
+        recruit = get_object_or_404(Gladiator, pk=recruit_id)
+
+        try:
+          school.purchase(recruit.value)
+          recruit.recruit()
+          school.advance_period()
+          return redirect('game:game', school_id=school.id)
+        except StandardError as err:
+          form.add_error(None, err)
+
+      elif recruit_id == -1:
         school.advance_period()
         return redirect('game:game', school_id=school.id)
 
