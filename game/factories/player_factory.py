@@ -1,10 +1,10 @@
-from factory import DjangoModelFactory, lazy_attribute, SubFactory
+from factory import DjangoModelFactory, lazy_attribute
+import faker
+fake = faker.Faker()
 
 
 class PlayerFactory(DjangoModelFactory):
   class Meta:
     model = 'game.Player'
-    django_get_or_create = ('user',)
 
-  user = SubFactory('game.factories.UserFactory')
-  name = lazy_attribute(lambda x: x.user.username)
+  name = lazy_attribute(lambda x: fake.first_name() + fake.last_name())

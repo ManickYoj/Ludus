@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             name='Match',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('base_pay', models.IntegerField(default=0)),
+                ('entry_fee', models.IntegerField(default=0)),
                 ('base_reward', models.IntegerField(default=0)),
                 ('seed', models.IntegerField()),
             ],
@@ -50,7 +50,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=60)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -62,8 +61,27 @@ class Migration(migrations.Migration):
                 ('day', models.PositiveIntegerField(default=0)),
                 ('ai', models.BooleanField(default=False)),
                 ('period', models.CharField(default=b'REC', max_length=3, choices=[(b'REC', b'Dawn'), (b'PRE', b'Midday'), (b'FIG', b'Dusk')])),
-                ('player', models.ForeignKey(to='game.Player')),
             ],
+        ),
+        migrations.CreateModel(
+            name='BotPlayer',
+            fields=[
+                ('player_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.Player')),
+            ],
+            bases=('game.player',),
+        ),
+        migrations.CreateModel(
+            name='UserPlayer',
+            fields=[
+                ('player_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.Player')),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+            ],
+            bases=('game.player',),
+        ),
+        migrations.AddField(
+            model_name='school',
+            name='player',
+            field=models.ForeignKey(to='game.Player'),
         ),
         migrations.AddField(
             model_name='gladiator',

@@ -2,6 +2,7 @@ from factory import (
   DjangoModelFactory,
   lazy_attribute,
   SubFactory,
+  Trait,
 )
 from game.models import School
 import random
@@ -19,3 +20,9 @@ class SchoolFactory(DjangoModelFactory):
   denarii = lazy_attribute(lambda x: random.randint(0, 1000000))
   day = lazy_attribute(lambda x: random.randint(0, 500))
   period = lazy_attribute(lambda x: random.choice(School.PERIODS))
+  ai = False
+
+  class Params:
+    bot = Trait(
+      ai=True,
+    )

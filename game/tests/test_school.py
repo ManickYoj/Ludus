@@ -1,6 +1,6 @@
 from django.test import TestCase
 from game.factories import SchoolFactory
-from game.models import School, Gladiator
+from game.models import School, Gladiator, Challenge
 from game.tests.matchers import change
 from expects import *
 
@@ -49,3 +49,16 @@ class SchoolTestCase(TestCase):
     expect(candidate0_id in id_list).to(be(True))
     expect(candidate1_id in id_list).to(be(False))
     expect(candidate2_id in id_list).to(be(False))
+
+  def test_generate_challenges(self):
+    school = SchoolFactory.create(day=1)
+    expect(Challenge.issued.filter(school=school).count()).to(be(0))
+
+    challenge_set_one = school.generate_challenges(3)
+    expect(Challenge.issued.filter(school=school).count()).to(be(3))
+
+    challenge_set_two = school.generate_challenges(3)
+    expect(Challenge.issued.filter(school=school).count()).to(be(3))
+    intersection = set(challenge_set_one).intersection(challenge_set_two)
+
+    expect(bool(intersection)).to(be(False))

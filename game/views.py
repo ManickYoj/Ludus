@@ -121,9 +121,59 @@ def recruit(request, school):
   return render(request, 'pages/recruit.html', context)
 
 
+class PrepareForm(forms.Form):
+  def __init__(self, gladiators, *args, **kwargs):
+    super(PrepareForm, self).__init__(*args, **kwargs)
+
+    train_choices = [
+      ("FIGH", "Enter in Fight"),
+      ("SPAR", "Spar with Gladiators"),
+      ("PRAC", "Practice with Dummy"),
+      ("REST", "Rest"),
+    ]
+
+    # self.fields['test'] = forms.ChoiceField(
+    #   label=gladiators[0].name,
+    #   choices=train_choices,
+    #   widget=forms.RadioSelect,
+    #   initial="REST",
+    # )
+    self.fields.update({
+      str(g.id): forms.ChoiceField(
+        label=g.name,
+        choices=train_choices,
+        widget=forms.RadioSelect,
+        initial="REST",
+      ) for g in gladiators
+    })
+
+
 def prepare(request, school):
-  school.advance_period()
-  return redirect('game:game', school_id=school.id)
+  gladiators = Gladiator.active.filter(school=school)
+
+  if request.method == 'POST':
+    form = PrepareForm(gladiators, request.POST)
+    print request.POST
+    print form.data
+
+    if form.is_valid():
+      for gladiator in gladiators:
+        action = form.cleaned_data[str(gladiator.id)]
+        gladiator.prepare(action)
+
+      school.advance_period()
+      return redirect('game:game', school_id=school.id)
+
+  else:
+    form = PrepareForm(gladiators)
+
+  context = {
+    'school': school,
+    'gladiators': gladiators,
+    'form': form,
+  }
+
+  return render(request, 'pages/prepare.html', context)
 
 
 def fight(request, school):

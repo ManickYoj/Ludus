@@ -10,24 +10,34 @@ class Player(models.Model):
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
 
-  # Foreign Keys
-  user = models.OneToOneField(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE
-  )
+  class Meta:
+    app_label = 'game'
 
   def __str__(self):
     return self.name
 
+
+class UserPlayer(Player):
+  # Foreign Keys
+  user = models.OneToOneField(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    parent_link=True,
+    related_name='player'
+  )
+
   class Meta:
     app_label = 'game'
+
+  def __str__(self):
+    return self.name
 
 
 # Create a new Player object when a new user registers
 @receiver(models.signals.post_save, sender=User)
 def create_player(sender, instance, created, **kwargs):
   if created:
-    Player.objects.create(
+    UserPlayer.objects.create(
       user=instance,
       name=instance.username
     )
@@ -37,3 +47,14 @@ def create_player(sender, instance, created, **kwargs):
 @receiver(models.signals.post_save, sender=User)
 def save_player(sender, instance, created, **kwargs):
   instance.player.save()
+
+
+class BotPlayer(Player):
+  # Foreign Keys
+  pass
+
+  class Meta:
+    app_label = 'game'
+
+  def __str__(self):
+    return self.name

@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 from _consts import ATTR_DEFAULT, NAME_MAX_LENGTH
 
@@ -83,3 +84,29 @@ class Gladiator(models.Model):
     self.recruited = True
     self.reserved = False
     self.save()
+
+  def increment_agility(self, incr):
+    self.agility += incr
+    self.save()
+
+  def increment_endurance(self, incr):
+    self.endurance += incr
+    self.save()
+
+  def increment_strength(self, incr):
+    self.strength += incr
+    self.save()
+
+  def prepare(self, action):
+    if action in ['SPAR', 'PRAC']:
+      incr_func = random.choice[
+        self.increment_agility,
+        self.increment_endurance,
+        self.increment_strength
+      ]
+
+      incr_func(1)
+
+    elif action == 'FIGH':
+      # TODO: Enter in match
+      pass

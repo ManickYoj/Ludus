@@ -4,8 +4,21 @@
   
   <form method=post>
     {% csrf_token %}
-      
-    {% for candidate in candidates %}
+    {{form}}
+<!--       {% for gladiator in gladiators %}
+        <label>{{gladiator.name}}</label>
+
+        <input id="FIGH-{{gladiator.id}}" type="radio" name={{gladiator.id}} value="FIGH">
+        <label for="FIGH-{{gladiator.id}}">Enter in Fight</label>
+
+        <input type="radio" name={{gladiator.id}} value="PRAC">
+        <label for="PRAC-{{gladiator.id}}">Practice with Dummy</label>
+
+        <input type="radio" name={{gladiator.id}} value="Spar with other Gladiators">
+        <input type="radio" name={{gladiator.id}} value="Rest">
+      {% endfor %} -->
+
+<!--     {% for candidate in candidates %}
       <div>
         <label>
           {% include "partials/gladiator_card.html" with gladiator=candidate school=school only %}
@@ -24,6 +37,7 @@
         <strong style="color: firebrick">{{ error|escape }}</strong>
       </div>
     {% endfor %}
-    <input type="submit" value="Recruit">
+    -->
+    <input type="submit" value="To the Arena!">
   </form>
 {% endblock %}

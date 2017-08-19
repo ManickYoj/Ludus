@@ -1,5 +1,7 @@
 from django.db import models
 from django.dispatch import receiver
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from _consts import NAME_MAX_LENGTH
 
 
@@ -55,6 +57,7 @@ class School(models.Model):
     if index == 0:
       self.day += 1
       self.generate_candidates()
+      self.generate_challenges()
 
     self.save()
 
@@ -97,20 +100,71 @@ class School(models.Model):
 
     return candidates
 
-  @receiver(models.signals.post_save, sender='game.School')
-  def setup_school(sender, instance, created, **kwargs):
-    """
-    Run setup logic on school. Specifically, generate initial candidates and
-    challenges.
+  def generate_challenge(self):
+    from game.factories import MatchFactory, SchoolFactory, GladiatorFactory
+    from game.models import Challenge, Gladiator
 
-    Args:
-      sender: [description]
-      instance: [description]
-      created: [description]
-      **kwargs: [description]
-    """
-    if created:
-      instance.generate_candidates()
+    match = MatchFactory(entry=True)
+
+    challenger_school = School.objects.filter(ai=True).first()
+    if challenger_school is None:
+      challenger_school = SchoolFactory(bot=True)
+
+    challenger = Gladiator.active.filter(school=challenger_school).first()
+    if challenger is None:
+      challenger = GladiatorFactory(recruit=True, school=challenger_school)
+
+    # Create challenge as issued by bot for posterity
+    Challenge(
+      status=Challenge.ACCEPTED,
+      day=challenger_school.day,
+      school=challenger_school,
+      gladiator=challenger,
+      match=match,
+    ).save()
+
+    # Return a challenge to the current school
+    challenge = Challenge(
+      status=Challenge.ISSUED,
+      day=self.day,
+      school=self,
+      match=match,
+    )
+
+    challenge.save()
+
+    return challenge
+
+  def generate_challenges(self, count=3):
+    from game.models import Challenge
+
+    challenges = list(
+      Challenge.issued.filter(
+        school=self,
+      )
+    )
+
+    for challenge in challenges:
+      challenge.status = Challenge.REJECTED
+      challenge.save()
+
+    return [self.generate_challenge() for _ in range(count)]
+
+  # @receiver(models.signals.post_save, sender='game.School')
+  # def setup_school(sender, instance, created, **kwargs):
+  #   """
+  #   Run setup logic on school. Specifically, generate initial candidates and
+  #   challenges.
+
+  #   Args:
+  #     sender: [description]
+  #     instance: [description]
+  #     created: [description]
+  #     **kwargs: [description]
+  #   """
+  #   if created:
+  #     instance.generate_candidates()
+  #     instance.generate_challenges()
 
   def can_purchase(self, amount):
     return True if (self.denarii - amount) >= 0 else False

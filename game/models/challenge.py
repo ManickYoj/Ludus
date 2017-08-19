@@ -1,7 +1,20 @@
 from django.db import models
 
 
+class IssuedManager(models.Manager):
+  def get_queryset(self):
+    return super(
+      IssuedManager, self
+    ).get_queryset().filter(
+      status=Challenge.ISSUED
+    )
+
+
 class Challenge(models.Model):
+  # Managers
+  objects = models.Manager()
+  issued = IssuedManager()
+
   # Enum
   ISSUED = 'ISS'
   ACCEPTED = 'ACC'
@@ -27,11 +40,11 @@ class Challenge(models.Model):
   )
 
   # Foreign Keys
-  school = models.OneToOneField(
+  school = models.ForeignKey(
     'School',
     on_delete=models.CASCADE
   )
-  gladiator = models.OneToOneField(
+  gladiator = models.ForeignKey(
     'Gladiator',
     on_delete=models.CASCADE,
     null=True,
