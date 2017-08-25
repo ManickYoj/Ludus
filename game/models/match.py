@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 
 class Match(models.Model):
@@ -9,3 +10,8 @@ class Match(models.Model):
 
   class Meta:
     app_label = 'game'
+
+  def get_random_generator(self):
+    random_generator = random.Random()
+    random_generator.seed(self.seed)
+    return random_generator

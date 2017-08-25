@@ -1,35 +1,23 @@
 from django.conf.urls import url
 
-from . import views
+from game.views import create_school, select_school, game
 
 urlpatterns = [
     url(
       r'^$',
-      views.select_school,
+      select_school,
       name='select-school'
     ),
 
     url(
       r'^create-school/$',
-      views.create_school,
+      create_school,
       name='create-school'
     ),
 
     url(
       r'^game/(?P<school_id>[0-9]+)/$',
-      views.game,
+      game,
       name='game'
-    ),
-
-    url(
-      r'^players/$',
-      views.players,
-      name='players'
-    ),
-
-    url(
-      r'^players/(?P<player_id>[0-9]+)/$',
-      views.player,
-      name='player'
     ),
 ]

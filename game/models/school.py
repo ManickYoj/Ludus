@@ -1,20 +1,21 @@
 from django.db import models
-from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from random import choice
+import enum
+
+from game.models import Gladiator
+# from game.factories.gladiator_factory import GladiatorFactory
 from _consts import NAME_MAX_LENGTH
 
 
 class School(models.Model):
-  # Enum values
-  RECRUIT = 'REC'
-  PREPARE = 'PRE'
-  FIGHT = 'FIG'
-  PERIODS = [
-    RECRUIT,
-    PREPARE,
-    FIGHT,
-  ]
+  class Meta:
+    app_label = 'game'
+
+  @enum.unique
+  class PERIOD(enum.Enum):
+    RECRUIT = 'RE'
+    ASSIGN = 'AS'
+    FIGHT = 'FI'
 
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
@@ -22,13 +23,9 @@ class School(models.Model):
   day = models.PositiveIntegerField(default=0)
   ai = models.BooleanField(default=False)
   period = models.CharField(
-    max_length=3,
-    choices=(
-      (RECRUIT, 'Dawn'),
-      (PREPARE, 'Midday'),
-      (FIGHT, 'Dusk'),
-    ),
-    default=RECRUIT
+    max_length=2,
+    choices=((x.value, x.name) for x in PERIOD),
+    default=PERIOD.RECRUIT
   )
 
   # Foreign Keys
@@ -39,9 +36,6 @@ class School(models.Model):
 
   def __str__(self):
     return self.name
-
-  class Meta:
-    app_label = 'game'
 
   def advance_period(self):
     """
@@ -73,9 +67,6 @@ class School(models.Model):
     Returns:
       The `count` candidate gladiators (list)
     """
-    from game.models import Gladiator
-    from game.factories import GladiatorFactory
-    from random import choice
 
     # Remove all candidates from the school who were not reserved yesterday
     Gladiator.candidates.filter(
@@ -84,13 +75,11 @@ class School(models.Model):
       reserved_on=self.day - 1
     ).delete()
 
-    candidates = list(Gladiator.candidates.filter(
-      school=self
-    ))
+    candidates = list(Gladiator.candidates.filter(school=self))
 
     generators = [
-      lambda: GladiatorFactory(convict=True, school=self),
-      lambda: GladiatorFactory(conscript=True, school=self),
+      # lambda: GladiatorFactory(convict=True, school=self),
+      # lambda: GladiatorFactory(conscript=True, school=self),
     ]
 
     # Generate a new candidate from a random generator until we have filled up
@@ -99,72 +88,6 @@ class School(models.Model):
       candidates.append(choice(generators)())
 
     return candidates
-
-  def generate_challenge(self):
-    from game.factories import MatchFactory, SchoolFactory, GladiatorFactory
-    from game.models import Challenge, Gladiator
-
-    match = MatchFactory(entry=True)
-
-    challenger_school = School.objects.filter(ai=True).first()
-    if challenger_school is None:
-      challenger_school = SchoolFactory(bot=True)
-
-    challenger = Gladiator.active.filter(school=challenger_school).first()
-    if challenger is None:
-      challenger = GladiatorFactory(recruit=True, school=challenger_school)
-
-    # Create challenge as issued by bot for posterity
-    Challenge(
-      status=Challenge.ACCEPTED,
-      day=challenger_school.day,
-      school=challenger_school,
-      gladiator=challenger,
-      match=match,
-    ).save()
-
-    # Return a challenge to the current school
-    challenge = Challenge(
-      status=Challenge.ISSUED,
-      day=self.day,
-      school=self,
-      match=match,
-    )
-
-    challenge.save()
-
-    return challenge
-
-  def generate_challenges(self, count=3):
-    from game.models import Challenge
-
-    challenges = list(
-      Challenge.issued.filter(
-        school=self,
-      )
-    )
-
-    for challenge in challenges:
-      challenge.status = Challenge.REJECTED
-      challenge.save()
-
-    return [self.generate_challenge() for _ in range(count)]
-
-  # @receiver(models.signals.post_save, sender='game.School')
-  # def setup_school(sender, instance, created, **kwargs):
-  #   """
-  #   Run setup logic on school. Specifically, generate initial candidates and
-  #   challenges.
-
-  #   Args:
-  #     sender: [description]
-  #     instance: [description]
-  #     created: [description]
-  #     **kwargs: [description]
-  #   """
-  #   if created:
-  #     instance.generate_candidates()
-  #     instance.generate_challenges()
 
   def can_purchase(self, amount):
     return True if (self.denarii - amount) >= 0 else False
@@ -175,3 +98,30 @@ class School(models.Model):
       self.save()
     else:
       raise StandardError("Cannot purchase. Not enough denarii.")
+
+  # def generate_challenge(self):
+  #   from game.factories import MatchFactory, SchoolFactory, GladiatorFactory
+  #   from game.models import Challenge, Gladiator
+
+  #   challenger_school = School.objects.filter(ai=True).first()
+  #   if challenger_school is None:
+  #     challenger_school = SchoolFactory(bot=True)
+
+  #   challenger = Gladiator.active.filter(school=challenger_school).first()
+  #   if challenger is None:
+  #     challenger = GladiatorFactory(recruit=True, school=challenger_school)
+
+  # def generate_challenges(self, count=3):
+  #   from game.models import Challenge
+
+  #   challenges = list(
+  #     Challenge.issued.filter(
+  #       school=self,
+  #     )
+  #   )
+
+  #   for challenge in challenges:
+  #     challenge.status = Challenge.REJECTED
+  #     challenge.save()
+
+  #   return [self.generate_challenge() for _ in range(count)]
