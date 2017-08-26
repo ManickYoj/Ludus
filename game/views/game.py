@@ -13,13 +13,15 @@ def game(request, school_id):
   school = get_object_or_404(School, pk=school_id)
 
   HANDLERS = {
-    School.PERIOD.RECRUIT: recruit,
-    School.PREPARE: prepare,
-    School.FIGHT: fight,
+    School.PERIOD.RECRUIT.value: recruit,
+    School.PERIOD.ASSIGN.value: prepare,
+    School.PERIOD.FIGHT.value: fight,
   }
 
-  if not school.player.user == request.user:
+  if not school.player.userplayer == request.user.player:
     raise PermissionDenied
+
+  print "School Period: {}".format(school.period)
 
   return HANDLERS[school.period](request, school)
 
@@ -51,18 +53,26 @@ def recruit(request, school):
       candidate_ids = [c.id for c in candidates]
 
       if recruit_id in candidate_ids:
+        print "1"
         recruit = get_object_or_404(Gladiator, pk=recruit_id)
+        print "2"
 
         try:
+          print "3"
           school.purchase(recruit.value)
+          print "4"
           recruit.recruit()
+          print "5"
           school.advance_period()
+          print "6"
           return redirect('game:game', school_id=school.id)
         except StandardError as err:
           form.add_error(None, err)
 
       elif recruit_id == -1:
+        print "7"
         school.advance_period()
+        print "8"
         return redirect('game:game', school_id=school.id)
 
   else:

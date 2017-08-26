@@ -1,9 +1,7 @@
 from django.db import models
-from random import choice
 import enum
 
 from game.models import Gladiator
-# from game.factories.gladiator_factory import GladiatorFactory
 from _consts import NAME_MAX_LENGTH
 
 
@@ -12,20 +10,25 @@ class School(models.Model):
     app_label = 'game'
 
   @enum.unique
-  class PERIOD(enum.Enum):
-    RECRUIT = 'RE'
-    ASSIGN = 'AS'
-    FIGHT = 'FI'
+  class PERIOD(enum.IntEnum):
+    RECRUIT = 0
+    ASSIGN = 1
+    FIGHT = 2
+
+    def next(self):
+      cls = self.__class__
+      members = list(cls)
+      index = (members.index(self) + 1) % len(cls)
+      return members[index]
 
   # Data
   name = models.CharField(max_length=NAME_MAX_LENGTH)
   denarii = models.PositiveIntegerField(default=2000)
   day = models.PositiveIntegerField(default=0)
   ai = models.BooleanField(default=False)
-  period = models.CharField(
-    max_length=2,
-    choices=((x.value, x.name) for x in PERIOD),
-    default=PERIOD.RECRUIT
+  _period = models.IntegerField(
+    choices=((x.value, x.name.title()) for x in PERIOD),
+    default=PERIOD.RECRUIT.value,
   )
 
   # Foreign Keys
@@ -33,6 +36,14 @@ class School(models.Model):
     'Player',
     on_delete=models.CASCADE
   )
+
+  @property
+  def period(self):
+    return School.PERIOD(self._period)
+
+  @period.setter
+  def period(self, value):
+    self._period = value
 
   def __str__(self):
     return self.name
@@ -43,15 +54,12 @@ class School(models.Model):
     the day does advance, triggers the regeneration of recruits and
     challenges.
     """
-    # TODO: When linked with recruits, ensure that this method reserves any
-    # recruits with a hold on them for the next day.
-    index = (School.PERIODS.index(self.period) + 1) % len(School.PERIODS)
-    self.period = School.PERIODS[index]
+    self.period = self.period.next()
 
-    if index == 0:
+    if self.period.value == 0:
       self.day += 1
       self.generate_candidates()
-      self.generate_challenges()
+      # self.generate_challenges()
 
     self.save()
 
@@ -67,6 +75,7 @@ class School(models.Model):
     Returns:
       The `count` candidate gladiators (list)
     """
+    print "Generating Candidates ..."
 
     # Remove all candidates from the school who were not reserved yesterday
     Gladiator.candidates.filter(
@@ -77,15 +86,9 @@ class School(models.Model):
 
     candidates = list(Gladiator.candidates.filter(school=self))
 
-    generators = [
-      # lambda: GladiatorFactory(convict=True, school=self),
-      # lambda: GladiatorFactory(conscript=True, school=self),
-    ]
-
-    # Generate a new candidate from a random generator until we have filled up
-    # the roster
+    # Generate new candidates until we have filled up the roster
     while len(candidates) < count:
-      candidates.append(choice(generators)())
+      candidates.append(Gladiator.generate(school=self))
 
     return candidates
 

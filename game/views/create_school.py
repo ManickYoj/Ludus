@@ -16,6 +16,7 @@ def create_school(request):
       instance = form.save(commit=False)
       instance.player = request.user.player
       instance.save()
+      instance.generate_candidates()
       return redirect('game:select-school')
 
   else:

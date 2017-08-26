@@ -7,8 +7,9 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
+    replaces = [(b'game', '0001_initial'), (b'game', '0002_auto_20170826_1931'), (b'game', '0003_auto_20170826_1934')]
+
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
@@ -60,7 +61,7 @@ class Migration(migrations.Migration):
                 ('denarii', models.PositiveIntegerField(default=2000)),
                 ('day', models.PositiveIntegerField(default=0)),
                 ('ai', models.BooleanField(default=False)),
-                ('period', models.CharField(default=b'REC', max_length=3, choices=[(b'REC', b'Dawn'), (b'PRE', b'Midday'), (b'FIG', b'Dusk')])),
+                ('period', models.IntegerField(default=(0, b'Recruit'), choices=[(0, b'Recruit'), (1, b'Assign'), (2, b'Fight')])),
             ],
         ),
         migrations.CreateModel(
@@ -74,7 +75,7 @@ class Migration(migrations.Migration):
             name='UserPlayer',
             fields=[
                 ('player_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.Player')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(parent_link=True, related_name='player', to=settings.AUTH_USER_MODEL)),
             ],
             bases=('game.player',),
         ),
@@ -91,7 +92,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='challenge',
             name='gladiator',
-            field=models.OneToOneField(null=True, default=None, blank=True, to='game.Gladiator'),
+            field=models.ForeignKey(default=None, blank=True, to='game.Gladiator', null=True),
         ),
         migrations.AddField(
             model_name='challenge',
@@ -101,6 +102,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='challenge',
             name='school',
-            field=models.OneToOneField(to='game.School'),
+            field=models.ForeignKey(to='game.School'),
+        ),
+        migrations.RenameField(
+            model_name='school',
+            old_name='period',
+            new_name='_period',
+        ),
+        migrations.AlterField(
+            model_name='school',
+            name='_period',
+            field=models.IntegerField(default=0, choices=[(0, b'Recruit'), (1, b'Assign'), (2, b'Fight')]),
         ),
     ]

@@ -1,7 +1,7 @@
 from django.db import models
 import random
 
-from _consts import ATTR_DEFAULT, NAME_MAX_LENGTH
+from _consts import NAME_MAX_LENGTH, FIRST_NAMES, FAMILY_NAMES
 
 
 class ActiveManager(models.Manager):
@@ -30,6 +30,9 @@ class KilledManager(models.Manager):
 
 
 class Gladiator(models.Model):
+  class Meta:
+    app_label = 'game'
+
   # Managers
   objects = models.Manager()
   active = ActiveManager()
@@ -42,9 +45,9 @@ class Gladiator(models.Model):
   value = models.IntegerField(default=0)
   fame = models.IntegerField(default=0)
 
-  agility = models.IntegerField(default=ATTR_DEFAULT)
-  strength = models.IntegerField(default=ATTR_DEFAULT)
-  endurance = models.IntegerField(default=ATTR_DEFAULT)
+  agility = models.IntegerField(default=0)
+  strength = models.IntegerField(default=0)
+  endurance = models.IntegerField(default=0)
 
   reserved_on = models.PositiveIntegerField(
     blank=True,
@@ -68,11 +71,33 @@ class Gladiator(models.Model):
     on_delete=models.CASCADE,
   )
 
+  @classmethod
+  def generate(cls, school, fame=0):
+    skill_points = (fame / 10) + 6
+    skills = {
+      'agility': 0,
+      'strength': 0,
+      'endurance': 0,
+    }
+
+    for i in range(skill_points):
+      skill_name = random.choice(skills.keys())
+      skills[skill_name] += 1
+
+    gladiator = cls(
+      name=random.choice(FIRST_NAMES) + " " + random.choice(FAMILY_NAMES),
+      school=school,
+      agility=skills['agility'],
+      strength=skills['strength'],
+      endurance=skills['endurance'],
+    )
+
+    gladiator.save()
+
+    return gladiator
+
   def __str__(self):
     return self.name
-
-  class Meta:
-    app_label = 'game'
 
   def recruit(self):
     """
@@ -80,6 +105,7 @@ class Gladiator(models.Model):
 
     Updates the current gladiator object to reflect that it has been recruited.
     """
+    print "Recruiting Gladiator ... "
     self.recruited_on = self.school.day
     self.recruited = True
     self.reserved = False
