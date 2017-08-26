@@ -63,6 +63,11 @@ class School(models.Model):
 
     self.save()
 
+  def assign(self, actions_by_gladiator):
+    import pprint
+    pp = pprint.PrettyPrinter()
+    pp.pprint(actions_by_gladiator)
+
   def generate_candidates(self, count=3):
     """
     Generates a set of candidates totaling `count`. Candidates reserved on

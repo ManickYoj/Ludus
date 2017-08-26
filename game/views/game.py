@@ -53,26 +53,18 @@ def recruit(request, school):
       candidate_ids = [c.id for c in candidates]
 
       if recruit_id in candidate_ids:
-        print "1"
         recruit = get_object_or_404(Gladiator, pk=recruit_id)
-        print "2"
 
         try:
-          print "3"
           school.purchase(recruit.value)
-          print "4"
           recruit.recruit()
-          print "5"
           school.advance_period()
-          print "6"
           return redirect('game:game', school_id=school.id)
         except StandardError as err:
           form.add_error(None, err)
 
       elif recruit_id == -1:
-        print "7"
         school.advance_period()
-        print "8"
         return redirect('game:game', school_id=school.id)
 
   else:
@@ -98,12 +90,6 @@ class PrepareForm(forms.Form):
       ("REST", "Rest"),
     ]
 
-    # self.fields['test'] = forms.ChoiceField(
-    #   label=gladiators[0].name,
-    #   choices=train_choices,
-    #   widget=forms.RadioSelect,
-    #   initial="REST",
-    # )
     self.fields.update({
       str(g.id): forms.ChoiceField(
         label=g.name,
@@ -121,11 +107,13 @@ def prepare(request, school):
     form = PrepareForm(gladiators, request.POST)
 
     if form.is_valid():
-      for gladiator in gladiators:
-        action = form.cleaned_data[str(gladiator.id)]
-        gladiator.prepare(action)
+      actions_by_gladiator = {
+        g: form.cleaned_data[str(g.id)] for g in gladiators
+      }
 
+      school.assign(actions_by_gladiator)
       school.advance_period()
+
       return redirect('game:game', school_id=school.id)
 
   else:
