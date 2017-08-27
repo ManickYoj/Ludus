@@ -10,6 +10,23 @@ class School(models.Model):
     app_label = 'game'
 
   @enum.unique
+  class ASSIGNMENTS(enum.IntEnum):
+    FIGHT = 0
+    SPAR = 1
+    PRACTICE = 2
+    REST = 3
+
+    def desc(self):
+      cls = self.__class__
+      descriptions = {
+        cls.FIGHT: "Enter in Fight",
+        cls.SPAR: "Spar with Another Gladiator",
+        cls.PRACTICE: "Practice with Dummy",
+        cls.REST: "Rest",
+      }
+      return descriptions[self]
+
+  @enum.unique
   class PERIOD(enum.IntEnum):
     RECRUIT = 0
     ASSIGN = 1
@@ -63,10 +80,13 @@ class School(models.Model):
 
     self.save()
 
-  def assign(self, actions_by_gladiator):
+  def assign(self, gladiators_by_action):
+    # TODO: Delete this debug block
     import pprint
     pp = pprint.PrettyPrinter()
-    pp.pprint(actions_by_gladiator)
+    pp.pprint(gladiators_by_action)
+
+    # TODO: Do this.
 
   def generate_candidates(self, count=3):
     """
@@ -80,7 +100,6 @@ class School(models.Model):
     Returns:
       The `count` candidate gladiators (list)
     """
-    print "Generating Candidates ..."
 
     # Remove all candidates from the school who were not reserved yesterday
     Gladiator.candidates.filter(

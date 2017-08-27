@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django import forms
 
 from game.models import Gladiator
@@ -14,14 +14,12 @@ def game(request, school_id):
 
   HANDLERS = {
     School.PERIOD.RECRUIT.value: recruit,
-    School.PERIOD.ASSIGN.value: prepare,
+    School.PERIOD.ASSIGN.value: Assign,
     School.PERIOD.FIGHT.value: fight,
   }
 
   if not school.player.userplayer == request.user.player:
     raise PermissionDenied
-
-  print "School Period: {}".format(school.period)
 
   return HANDLERS[school.period](request, school)
 
@@ -30,23 +28,41 @@ def game(request, school_id):
 # Rather, a matching custom form is rendered (to make the layout easier)
 # and this class is used to validate the form response
 class RecruitmentForm(forms.Form):
-  def __init__(self, candidates, *args, **kwargs):
+  def __init__(self, school, candidates, *args, **kwargs):
     super(RecruitmentForm, self).__init__(*args, **kwargs)
+    self.school = school
 
     candiate_choices = [(c.id, c.name) for c in candidates]
-    candiate_choices.append(("-1", 'Do not recruit a gladiator today.'))
+
+    candiate_choices.append(("-1", 'NO-RECRUIT'))
 
     self.fields['recruit_id'] = forms.ChoiceField(
       choices=candiate_choices,
       widget=forms.RadioSelect,
     )
 
+  def clean_recruit_id(self):
+    # Only allow a player to opt out of recruitment if they have at least
+    # one gladiator
+    if (
+      self.cleaned_data['recruit_id'] == "-1" and
+      Gladiator.active.filter(school=self.school).count() == 0
+    ):
+      err = (
+        'Cannot opt out of recruitment if you have no live gladiators.'
+      )
+      # TODO: This should be field specific, but the page doesn't display
+      # field specific errors right now
+      self.add_error(None, err)
+
+    return self.cleaned_data['recruit_id']
+
 
 def recruit(request, school):
   candidates = school.gladiator_set.filter(recruited_on=None)
 
   if request.method == 'POST':
-    form = RecruitmentForm(candidates, request.POST)
+    form = RecruitmentForm(school, candidates, request.POST)
 
     if form.is_valid():
       recruit_id = int(form.cleaned_data['recruit_id'])
@@ -68,7 +84,7 @@ def recruit(request, school):
         return redirect('game:game', school_id=school.id)
 
   else:
-    form = RecruitmentForm(candidates)
+    form = RecruitmentForm(school, candidates)
 
   context = {
     'school': school,
@@ -79,45 +95,71 @@ def recruit(request, school):
   return render(request, 'pages/recruit.html', context)
 
 
-class PrepareForm(forms.Form):
+class AssignForm(forms.Form):
   def __init__(self, gladiators, *args, **kwargs):
-    super(PrepareForm, self).__init__(*args, **kwargs)
-
-    train_choices = [
-      ("FIGH", "Enter in Fight"),
-      ("SPAR", "Spar with Gladiators"),
-      ("PRAC", "Practice with Dummy"),
-      ("REST", "Rest"),
-    ]
+    super(AssignForm, self).__init__(*args, **kwargs)
+    self.gladiators = gladiators
 
     self.fields.update({
       str(g.id): forms.ChoiceField(
         label=g.name,
-        choices=train_choices,
+        choices=[(a.value, a.desc()) for a in School.ASSIGNMENTS],
         widget=forms.RadioSelect,
-        initial="REST",
+        initial=School.ASSIGNMENTS.REST.value,
       ) for g in gladiators
     })
 
+  def clean(self):
+    super(AssignForm, self).clean()
+    assignments = School.ASSIGNMENTS
+    gladiators_by_action = {a: [] for a in assignments}
 
-def prepare(request, school):
+    for gladiator in self.gladiators:
+      action = assignments(int(self.cleaned_data[str(gladiator.id)]))
+      gladiators_by_action.setdefault(action, []).append(gladiator)
+
+    if len(gladiators_by_action[assignments.FIGHT]) != 1:
+      err = "Must have exactly one gladiator entered in a fight."
+      self.add_error(None, err)
+
+    if not (
+      len(gladiators_by_action[assignments.SPAR]) == 0 or
+      len(gladiators_by_action[assignments.SPAR]) == 2
+    ):
+      err = (
+        "Must have exactly two gladiators (or none) "
+        "as sparring partners."
+      )
+      self.add_error(None, err)
+
+    if len(gladiators_by_action[assignments.PRACTICE]) > 3:
+      err = (
+        "A maximum of three gladiators can spar. "
+        "We've only got so many dummies!"
+      )
+      self.add_error(None, err)
+
+    self.cleaned_data['gladiators_by_action'] = gladiators_by_action
+
+    return self.cleaned_data
+
+
+def Assign(request, school):
   gladiators = Gladiator.active.filter(school=school)
 
   if request.method == 'POST':
-    form = PrepareForm(gladiators, request.POST)
+    form = AssignForm(gladiators, request.POST)
 
     if form.is_valid():
-      actions_by_gladiator = {
-        g: form.cleaned_data[str(g.id)] for g in gladiators
-      }
+      gladiators_by_action = form.cleaned_data['gladiators_by_action']
 
-      school.assign(actions_by_gladiator)
+      school.assign(gladiators_by_action)
       school.advance_period()
 
       return redirect('game:game', school_id=school.id)
 
   else:
-    form = PrepareForm(gladiators)
+    form = AssignForm(gladiators)
 
   context = {
     'school': school,
@@ -125,7 +167,7 @@ def prepare(request, school):
     'form': form,
   }
 
-  return render(request, 'pages/prepare.html', context)
+  return render(request, 'pages/assign.html', context)
 
 
 def fight(request, school):

@@ -1,0 +1,15 @@
+{% extends "base/base_game.html" %}
+
+{% block content %}
+  
+  <form method=post>
+    {% csrf_token %}
+    {{form}}
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">
+        <strong style="color: firebrick">{{ error|escape }}</strong>
+      </div>
+    {% endfor %}
+    <input type="submit" value="To the Arena!">
+  </form>
+{% endblock %}

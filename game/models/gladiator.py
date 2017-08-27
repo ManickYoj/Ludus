@@ -105,7 +105,6 @@ class Gladiator(models.Model):
 
     Updates the current gladiator object to reflect that it has been recruited.
     """
-    print "Recruiting Gladiator ... "
     self.recruited_on = self.school.day
     self.recruited = True
     self.reserved = False
@@ -122,17 +121,3 @@ class Gladiator(models.Model):
   def increment_strength(self, incr):
     self.strength += incr
     self.save()
-
-  def prepare(self, action):
-    if action in ['SPAR', 'PRAC']:
-      incr_func = random.choice[
-        self.increment_agility,
-        self.increment_endurance,
-        self.increment_strength
-      ]
-
-      incr_func(1)
-
-    elif action == 'FIGH':
-      # TODO: Enter in match
-      pass
